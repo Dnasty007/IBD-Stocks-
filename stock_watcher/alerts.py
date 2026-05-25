@@ -76,7 +76,7 @@ def build_alerts(
             )
         )
 
-    urgent_count = sum(1 for headline in headlines if headline.is_urgent)
+    urgent_count = sum(1 for headline in headlines if headline.is_urgent or headline.is_upgrade)
     if urgent_count:
         alerts.append(
             AlertEvent(

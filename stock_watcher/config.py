@@ -33,6 +33,9 @@ ANALYST_UPGRADE_KEYWORDS = (
     "price target raised",
     "raises price target",
     "bullish",
+    "strong buy",
+    "buy rating",
+    "price target increased",
 )
 
 URGENT_NEWS_KEYWORDS = (
@@ -44,6 +47,11 @@ URGENT_NEWS_KEYWORDS = (
     "reverse split",
     "delisting",
     "lawsuit",
+    "sec investigation",
+    "earnings miss",
+    "guidance lowered",
+    "contract win",
+    "partnership",
 )
 
 

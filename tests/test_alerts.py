@@ -65,6 +65,7 @@ class BuildAlertsTests(unittest.TestCase):
             "volume_spike",
             "market_crash",
             "price_shock",
+            "urgent_news",
             "upgrade_news",
         })
 

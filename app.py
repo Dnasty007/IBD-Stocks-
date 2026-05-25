@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 import streamlit as st
@@ -19,6 +19,7 @@ from stock_watcher.config import (
     NEWS_LIMIT,
     build_stock_registry,
 )
+from stock_watcher.context import get_company_context
 from stock_watcher.data.rss import RSSNewsService
 from stock_watcher.data.yahoo_finance import YahooFinanceService
 from stock_watcher.formatting import (
@@ -421,6 +422,14 @@ def render_stock_deep_dive(
         render_alert_rail(alerts)
         render_position_summary(profile.symbol, price_lookup, positions)
 
+        render_section_header(
+            "Company Context",
+            "Why this stock matters",
+            "Static thesis note from the local watchlist context layer.",
+        )
+        with st.container(border=True):
+            st.markdown(get_company_context(profile))
+
         urgent_insights = build_urgent_insights(context.quote, headlines)
         if urgent_insights:
             render_section_header(
@@ -619,6 +628,31 @@ def render_global_portfolio(
                                 format_ratio(context.quote.volume_ratio),
                                 border=True,
                             )
+                            st.caption("Why this stock matters")
+                            st.markdown(get_company_context(context.profile))
+
+                            # Recent news links with recency filter + source + date
+                            try:
+                                news_service = RSSNewsService()
+                                recent_headlines = news_service.fetch_headlines(context.profile.rss_queries, limit=5)
+                                
+                                # Filter to last 7 days only
+                                cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+                                filtered = []
+                                for h in recent_headlines:
+                                    if h.published_at and h.published_at >= cutoff and h.link:
+                                        filtered.append(h)
+                                
+                                if filtered:
+                                    st.caption("Latest News (Last 7 days)")
+                                    for h in filtered[:3]:
+                                        title = h.title[:75] + "..." if len(h.title) > 75 else h.title
+                                        source = h.source or "Unknown"
+                                        days_ago = (datetime.now(timezone.utc) - h.published_at).days
+                                        time_str = f"{days_ago}d ago" if days_ago > 0 else "Today"
+                                        st.markdown(f"- [{title}]({h.link})  •  {source} • {time_str}")
+                            except Exception:
+                                pass
 
         render_section_header(
             "Source Allocation",

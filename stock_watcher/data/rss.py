@@ -97,7 +97,7 @@ class RSSNewsService:
 
     def _is_upgrade_headline(self, title: str) -> bool:
         normalized = title.lower()
-        if "downgrade" in normalized or "downgraded" in normalized:
+        if any(word in normalized for word in ["downgrade", "downgraded"]):
             return False
         return any(keyword in normalized for keyword in ANALYST_UPGRADE_KEYWORDS)
 
@@ -132,3 +132,8 @@ class RSSNewsService:
         if is_upgrade:
             return "positive"
         return "neutral"
+
+    def _clean_title(self, title: str) -> str:
+        # Remove common Google News artifacts
+        title = re.sub(r'\s*-\s*[^-]+$', '', title)
+        return title.strip()
