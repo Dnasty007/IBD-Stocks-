@@ -1,6 +1,10 @@
 [browser]
 gatherUsageStats = false
 
+[server]
+runOnSave = true
+fileWatcherType = "poll"
+
 [theme]
 base = "dark"
 primaryColor = "#35F2FF"

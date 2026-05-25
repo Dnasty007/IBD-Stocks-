@@ -542,10 +542,12 @@ def render_global_portfolio(
     def live_global_view() -> None:
         contexts = {}
         headlines_map = {}
+        market_snapshots = {}
         for profile in stock_registry.values():
             try:
                 contexts[profile.symbol] = load_stock_context(profile)
                 headlines_map[profile.symbol] = load_headlines(profile)
+                market_snapshots[profile.symbol] = load_market_snapshot(profile.benchmark_symbol)
             except Exception:
                 continue
 
@@ -631,28 +633,40 @@ def render_global_portfolio(
                             st.caption("Why this stock matters")
                             st.markdown(get_company_context(context.profile))
 
-                            # Recent news links with recency filter + source + date
-                            try:
-                                news_service = RSSNewsService()
-                                recent_headlines = news_service.fetch_headlines(context.profile.rss_queries, limit=5)
-                                
-                                # Filter to last 7 days only
-                                cutoff = datetime.now(timezone.utc) - timedelta(days=7)
-                                filtered = []
-                                for h in recent_headlines:
-                                    if h.published_at and h.published_at >= cutoff and h.link:
-                                        filtered.append(h)
-                                
-                                if filtered:
-                                    st.caption("Latest News (Last 7 days)")
-                                    for h in filtered[:3]:
-                                        title = h.title[:75] + "..." if len(h.title) > 75 else h.title
-                                        source = h.source or "Unknown"
-                                        days_ago = (datetime.now(timezone.utc) - h.published_at).days
-                                        time_str = f"{days_ago}d ago" if days_ago > 0 else "Today"
-                                        st.markdown(f"- [{title}]({h.link})  •  {source} • {time_str}")
-                            except Exception:
-                                pass
+                            market = market_snapshots.get(symbol)
+                            if market is not None:
+                                alerts = build_alerts(
+                                    context.quote,
+                                    market,
+                                    headlines_map.get(context.profile.symbol, []),
+                                    AlertSettings(
+                                        high_price_target=None,
+                                        volume_spike_ratio=DEFAULT_VOLUME_SPIKE_RATIO,
+                                        market_crash_pct=DEFAULT_CRASH_TRIGGER_PCT,
+                                    ),
+                                )
+                                if alerts:
+                                    for alert in alerts[:2]:
+                                        emoji = "🟢" if alert.severity == "positive" else "🔴" if alert.severity == "critical" else "🟠"
+                                        st.caption(f"{emoji} {alert.name.replace('_', ' ').title()}")
+
+                            cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+                            filtered = []
+                            for headline in headlines_map.get(symbol, []):
+                                published_at = headline.published_at
+                                if published_at and published_at.tzinfo is None:
+                                    published_at = published_at.replace(tzinfo=timezone.utc)
+                                if published_at and published_at >= cutoff and headline.link:
+                                    filtered.append((headline, published_at))
+
+                            if filtered:
+                                st.caption("Latest News (Last 7 days)")
+                                for headline, published_at in filtered[:3]:
+                                    title = headline.title[:75] + "..." if len(headline.title) > 75 else headline.title
+                                    source = headline.source or "Unknown"
+                                    days_ago = (datetime.now(timezone.utc) - published_at).days
+                                    time_str = f"{days_ago}d ago" if days_ago > 0 else "Today"
+                                    st.markdown(f"- [{title}]({headline.link}) - {source} - {time_str}")
 
         render_section_header(
             "Source Allocation",
