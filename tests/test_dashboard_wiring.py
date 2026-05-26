@@ -19,6 +19,20 @@ class DashboardWiringTests(unittest.TestCase):
         self.assertIn("market = market_snapshots.get(symbol)", app_source)
         self.assertNotIn("except Exception:\n                                pass", app_source)
 
+    def test_news_color_coding_stays_inside_recent_news_loop(self):
+        app_source = Path("app.py").read_text(encoding="utf-8")
+
+        self.assertIn(
+            'for headline, published_at in filtered[:3]:\n'
+            '                                    title = headline.title[:75] + "..." if len(headline.title) > 75 else headline.title\n'
+            '                                    source = headline.source or "Unknown"\n'
+            '                                    days_ago = (datetime.now(timezone.utc) - published_at).days\n'
+            '                                    time_str = f"{days_ago}d ago" if days_ago > 0 else "Today"\n'
+            '                                    if headline.is_urgent or headline.sentiment == "negative":',
+            app_source,
+        )
+        self.assertNotIn("\n                        if headline.is_urgent", app_source)
+
 
 if __name__ == "__main__":
     unittest.main()

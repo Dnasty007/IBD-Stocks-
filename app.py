@@ -660,13 +660,25 @@ def render_global_portfolio(
                                     filtered.append((headline, published_at))
 
                             if filtered:
+                                # Sentiment Summary
+                                pos = sum(1 for h, _ in filtered if h.is_upgrade or h.sentiment == "positive")
+                                urg = sum(1 for h, _ in filtered if h.is_urgent or h.sentiment == "negative")
+                                neu = len(filtered) - pos - urg
+                                st.caption(f"Sentiment: 🟢 {pos}  |  🔴 {urg}  |  ⚪ {neu}")
+                                
                                 st.caption("Latest News (Last 7 days)")
                                 for headline, published_at in filtered[:3]:
                                     title = headline.title[:75] + "..." if len(headline.title) > 75 else headline.title
                                     source = headline.source or "Unknown"
                                     days_ago = (datetime.now(timezone.utc) - published_at).days
                                     time_str = f"{days_ago}d ago" if days_ago > 0 else "Today"
-                                    st.markdown(f"- [{title}]({headline.link}) - {source} - {time_str}")
+                                    if headline.is_urgent or headline.sentiment == "negative":
+                                        color = "red"
+                                    elif headline.is_upgrade or headline.sentiment == "positive":
+                                        color = "green"
+                                    else:
+                                        color = "gray"
+                                    st.markdown(f":{color}[•] [{title}]({headline.link}) - {source} - {time_str}")
 
         render_section_header(
             "Source Allocation",
@@ -675,6 +687,7 @@ def render_global_portfolio(
         )
         with st.container(border=True):
             source_chart = build_source_exposure_chart(editor_frame)
+            st.caption(f"Updated: {datetime.now().strftime('%H:%M:%S')}")
             if source_chart is None:
                 render_empty_state("Add one or more positions to visualize source allocation.")
             else:
