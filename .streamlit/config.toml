@@ -1,9 +1,12 @@
 [browser]
 gatherUsageStats = false
+serverAddress = "localhost"
 
 [server]
 runOnSave = true
 fileWatcherType = "poll"
+headless = true
+enableXsrfProtection = false
 
 [theme]
 base = "dark"
