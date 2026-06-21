@@ -86,6 +86,66 @@ DEFAULT_STOCKS = (
         benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
         rss_queries=build_default_queries("RKLB", "Rocket Lab"),
     ),
+    StockProfile(
+        symbol="RHHBY",
+        display_name="Roche",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("RHHBY", "Roche"),
+    ),
+    StockProfile(
+        symbol="CECO",
+        display_name="CECO Environmental",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("CECO", "CECO Environmental"),
+    ),
+    StockProfile(
+        symbol="TGTX",
+        display_name="TG Therapeutics",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("TGTX", "TG Therapeutics"),
+    ),
+    StockProfile(
+        symbol="TVTX",
+        display_name="Travere Therapeutics",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("TVTX", "Travere Therapeutics"),
+    ),
+    StockProfile(
+        symbol="LQDA",
+        display_name="Liquidia",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("LQDA", "Liquidia"),
+    ),
+    StockProfile(
+        symbol="CGNX",
+        display_name="Cognex",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("CGNX", "Cognex"),
+    ),
+    StockProfile(
+        symbol="GRC",
+        display_name="Gorman-Rupp",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("GRC", "Gorman-Rupp"),
+    ),
+    StockProfile(
+        symbol="LTH",
+        display_name="Life Time Group",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("LTH", "Life Time Group"),
+    ),
+    StockProfile(
+        symbol="TILE",
+        display_name="Interface",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("TILE", "Interface"),
+    ),
+    StockProfile(
+        symbol="IBKR",
+        display_name="Interactive Brokers",
+        benchmark_symbol=DEFAULT_BENCHMARK_SYMBOL,
+        rss_queries=build_default_queries("IBKR", "Interactive Brokers"),
+    ),
 )
 
 STOCKS_BY_SYMBOL = {stock.symbol: stock for stock in DEFAULT_STOCKS}
